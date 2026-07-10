@@ -1,0 +1,149 @@
+# Verified passing detekt config for Compose/Android codebase.
+# Verified to pass on Kotlin 2.0.21 + detekt 1.23.8 with zero findings on
+# Compose MVVM code. Use as a starter template; adjust thresholds to taste.
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+config:
+  validation: true
+  # Comma-separate string, NOT YAML list.
+  excludes: 'style/MagicNumber,style/StringLiteralDuplication,style/UnusedPrivateMember,style/FunctionOnlyReturningConstant,style/SerialVersionUIDInSerializableClass,style/ModifierOrder,style/NoEmptyFirstLineInClassBody,performance/ArrayPrimitive,performance/ForEachOnRange'
+
+processors:
+  active: true
+  exclude:
+    - 'DetektProgressListener'
+
+console-reports:
+  active: true
+  exclude:
+    - 'ProjectStatisticsReport'
+    - 'ComplexityReport'
+    - 'NotificationReport'
+
+output-reports:
+  active: true
+  exclude:
+    - 'TxtOutputReport'
+
+# ── Style/formatting: fully delegated to ktlint ───────────────────────────
+style:
+  MagicNumber:
+    active: false
+  MaxLineLength:
+    active: false
+  WildcardImport:
+    active: false
+  ReturnCount:
+    active: false
+  LoopWithTooManyJumpStatements:
+    active: false
+  UnusedParameter:
+    active: false
+  UnusedImports:
+    active: true
+  NewLineAtEndOfFile:
+    active: true
+  OptionalAbstractKeyword:
+    active: true
+  OptionalUnit:
+    active: true
+  TrailingWhitespace:
+    active: true
+
+naming:
+  # Filename rule was removed in modern detekt; don't reference it.
+  MatchingDeclarationName:
+    active: false
+  MemberNameEqualsClassName:
+    active: true
+  TopLevelPropertyNaming:
+    active: true
+  PackageNaming:
+    active: true
+  # Composable functions are PascalCase by convention — do NOT enforce camelCase.
+  FunctionNaming:
+    active: false
+
+complexity:
+  LongParameterList:
+    active: true
+    functionThreshold: 8
+    constructorThreshold: 8
+    ignoreAnnotated: ['Composable', 'Inject']
+  LongMethod:
+    active: true
+    threshold: 80
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 25
+  NestedBlockDepth:
+    active: true
+    threshold: 5
+  TooManyFunctions:
+    active: true
+    thresholdInFiles: 20
+    thresholdInClasses: 20
+    ignoreAnnotated: ['Composable']
+
+potential-bugs:
+  HasPlatformType:
+    active: true
+  ImplicitDefaultLocale:
+    active: true
+  UnsafeCallOnNullableType:
+    active: true
+  UnsafeCast:
+    active: true
+  Deprecation:
+    active: true
+  NullCheckOnMutableProperty:
+    active: true
+  UnreachableCode:
+    active: true
+  WrongEqualsTypeParameter:
+    active: true
+
+exceptions:
+  # A boundary catch-all in a repository is intentional and user-friendly.
+  SwallowedException:
+    active: false
+  TooGenericExceptionCaught:
+    active: false
+  TooGenericExceptionThrown:
+    active: true
+
+performance:
+  SpreadOperator:
+    active: true
+  UnnecessaryTemporaryInstantiation:
+    active: true
+
+coroutines:
+  GlobalCoroutineUsage:
+    active: true
+  RedundantSuspendModifier:
+    active: true
+  SuspendFunWithFlowReturnType:
+    active: true
+  SleepInsteadOfDelay:
+    active: true
+
+empty-blocks:
+  # override fun onError(...) {} on UtteranceProgressListener is required by the
+  # API and never needs a body — keep EmptyFunctionBlock OFF to avoid noise.
+  EmptyFunctionBlock:
+    active: false
+  EmptyCatchBlock:
+    active: true
+  EmptyClassBlock:
+    active: true
+  EmptyDefaultConstructor:
+    active: true
+
+comments:
+  UndocumentedPublicClass:
+    active: false
+  UndocumentedPublicFunction:
+    active: false

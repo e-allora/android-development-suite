@@ -1,0 +1,136 @@
+{
+  "name": "android-development-suite",
+  "version": "2.1.0",
+  "description": "A comprehensive Android development skill suite with ten skills (an orchestrator driver + nine role-based skills), a shared PROJECT_CONTEXT template, an end-to-end workflow runbook, a scaffold/audit CLI, blueprint templates, and engineering reference documentation.",
+  "orchestrator": "SKILL.md",
+  "cli_tool": "scripts/android_suite_tool.py",
+  "skills": [
+    {
+      "name": "android-orchestrator-skill",
+      "path": "skills/android-orchestrator-skill/SKILL.md",
+      "role": "Orchestrator Driver",
+      "description": "Drives the full 9-stage Android pipeline from a single brief, delegating independent stages to parallel subagents and acting as the final gatekeeper.",
+      "triggers": ["orchestrate", "run the pipeline", "full workflow", "end-to-end", "agentic workflow", "drive the process", "build from scratch"],
+      "inputs": ["brief", "PROJECT_CONTEXT.md"],
+      "outputs": ["full pipeline run", "artifact map", "summary"],
+      "dependencies": ["android-product-skill", "android-architecture-skill", "android-ux-skill", "android-development-skill", "android-review-skill", "android-qa-skill", "android-build-skill", "android-release-skill", "android-maintenance-skill"]
+    },
+    {
+      "name": "android-product-skill",
+      "path": "skills/android-product-skill/SKILL.md",
+      "role": "Product Manager",
+      "description": "Owns requirements analysis, PRD authoring, user stories, acceptance criteria, backlog prioritization, and roadmapping.",
+      "triggers": ["requirements", "prd", "user story", "acceptance criteria", "backlog", "roadmap", "feature request", "stakeholder", "mvp", "definition of done", "definition of ready"],
+      "inputs": ["stakeholder requests", "market research", "user feedback", "business goals"],
+      "outputs": ["PRD", "user stories", "acceptance criteria", "prioritized backlog", "roadmap"],
+      "dependencies": ["android-architecture-skill", "android-ux-skill"]
+    },
+    {
+      "name": "android-architecture-skill",
+      "path": "skills/android-architecture-skill/SKILL.md",
+      "role": "Software Architect",
+      "description": "Translates the PRD into module structure, layer conventions, DI graph, data-layer design, presentation contracts, and ADRs.",
+      "triggers": ["architecture", "adr", "module structure", "layer", "dependency injection", "hilt graph", "data layer design", "presentation contracts", "system design", "tech debt"],
+      "inputs": ["PRD", "user stories", "acceptance criteria"],
+      "outputs": ["architecture plan", "ADRs", "module structure", "DI graph", "data layer design"],
+      "dependencies": ["android-product-skill", "android-development-skill", "android-ux-skill"]
+    },
+    {
+      "name": "android-ux-skill",
+      "path": "skills/android-ux-skill/SKILL.md",
+      "role": "UX Designer",
+      "description": "Turns requirements and architecture contracts into screens, screen states, navigation graph, theming, motion, and accessibility specs for the Developer to implement.",
+      "triggers": ["ux", "ui/ux", "screen", "navigation graph", "wireframe", "mockup", "flow", "screen states", "theming", "typography", "color", "motion", "accessibility", "design system"],
+      "inputs": ["PRD", "user stories", "presentation contracts"],
+      "outputs": ["UI spec", "screen catalog", "navigation graph", "theming tokens", "accessibility checklist"],
+      "dependencies": ["android-product-skill", "android-architecture-skill", "android-development-skill"]
+    },
+    {
+      "name": "android-development-skill",
+      "path": "skills/android-development-skill/SKILL.md",
+      "role": "Android Developer",
+      "description": "Implements features per the architecture plan and UX spec using the scaffold CLI: domain models, repositories, Room/Retrofit data sources, ViewModels, Compose screens, navigation, and tests.",
+      "triggers": ["implement", "scaffold", "feature", "compose screen", "viewmodel", "repository", "room", "retrofit", "navigation", "domain model", "ui state", "build the feature"],
+      "inputs": ["architecture plan", "ADR", "UX spec", "blueprint templates"],
+      "outputs": ["feature source code", "unit tests", "navigation graph"],
+      "dependencies": ["android-architecture-skill", "android-ux-skill", "android-review-skill"]
+    },
+    {
+      "name": "android-review-skill",
+      "path": "skills/android-review-skill/SKILL.md",
+      "role": "Code Reviewer",
+      "description": "Acts as a strict senior reviewer enforcing architecture conformity, Kotlin/Compose best practices, lifecycle safety, coroutine discipline, error handling, and security. Gates merges on critical/major issues.",
+      "triggers": ["review", "code review", "static analysis", "lint", "detekt", "ktlint", "architecture conformance", "lifecycle", "coroutine", "error handling", "security", "secret"],
+      "inputs": ["feature source code", "architecture plan", "ADRs", "PROJECT_CONTEXT.md"],
+      "outputs": ["review report", "issue list with severity", "merge gate decision"],
+      "dependencies": ["android-development-skill", "android-qa-skill"]
+    },
+    {
+      "name": "android-qa-skill",
+      "path": "skills/android-qa-skill/SKILL.md",
+      "role": "QA Engineer",
+      "description": "Designs the test plan, writes unit/UI/integration tests, configures CI pipelines, and enforces coverage quality gates.",
+      "triggers": ["test", "unit test", "ui test", "integration test", "coverage", "test plan", "test pyramid", "roborazzi", "turbine", "mockk", "quality gate", "ci pipeline"],
+      "inputs": ["feature source code", "architecture plan", "acceptance criteria"],
+      "outputs": ["test plan", "unit tests", "Compose UI tests", "integration tests", "CI pipeline", "coverage report"],
+      "dependencies": ["android-development-skill", "android-review-skill", "android-build-skill"]
+    },
+    {
+      "name": "android-build-skill",
+      "path": "skills/android-build-skill/SKILL.md",
+      "role": "Build Engineer",
+      "description": "Owns Gradle configuration, build types, product flavors, versioning, signing, ProGuard/R8 rules, and CI/CD pipeline generation for reproducible release-ready builds.",
+      "triggers": ["build.gradle", "gradle", "flavor", "build variant", "versioning", "version code", "signing config", "keystore", "ci", "cd", "proguard", "r8", "minify", "bundle", "aab"],
+      "inputs": ["architecture plan", "test report", "approved code"],
+      "outputs": ["Gradle config", "flavors", "signing config", "R8 rules", "CI pipeline"],
+      "dependencies": ["android-architecture-skill", "android-review-skill", "android-qa-skill", "android-release-skill"]
+    },
+    {
+      "name": "android-release-skill",
+      "path": "skills/android-release-skill/SKILL.md",
+      "role": "Release Engineer",
+      "description": "Runs pre-flight audits, prepares store listing copy, configures R8/ProGuard and signing, builds AABs, submits to Play Store, and manages staged rollouts.",
+      "triggers": ["release", "play store", "play store listing", "store listing", "privacy policy", "r8", "proguard", "minify", "signing", "aab", "app bundle", "rollout", "version bump", "release notes", "audit", "crash reporting"],
+      "inputs": ["tested source code", "release checklist", "store assets"],
+      "outputs": ["signed AAB", "store listing", "release notes", "rollout plan", "post-release report"],
+      "dependencies": ["android-qa-skill", "android-build-skill", "android-maintenance-skill"]
+    },
+    {
+      "name": "android-maintenance-skill",
+      "path": "skills/android-maintenance-skill/SKILL.md",
+      "role": "Maintenance Engineer",
+      "description": "Keeps the app stable over time: regression test plans, Room database migration strategy, feature flags, crash reporting & analytics, and safe deprecation.",
+      "triggers": ["maintenance", "regression", "db migration", "room migration", "feature flag", "feature toggle", "crashlytics", "analytics", "observability", "deprecation", "post-release"],
+      "inputs": ["release report", "architecture plan", "crash/analytics baselines"],
+      "outputs": ["regression plan", "migration strategy", "feature flag spec", "observability setup"],
+      "dependencies": ["android-release-skill", "android-product-skill"]
+    }
+  ],
+  "templates": [
+    "templates/blueprints/libs.versions.toml",
+    "templates/blueprints/build.gradle.kts",
+    "templates/blueprints/app.build.gradle.kts",
+    "templates/blueprints/AndroidManifest.xml",
+    "templates/blueprints/Application.kt",
+    "templates/blueprints/MainActivity.kt",
+    "templates/blueprints/Theme.kt",
+    "templates/PROJECT_CONTEXT.md"
+  ],
+  "references": [
+    "references/compose-style-guide.md",
+    "references/release-checklist.md",
+    "references/architecture-guide.md",
+    "references/testing-strategy.md",
+    "references/ux-design-guide.md",
+    "references/review-checklist.md",
+    "references/build-packaging-guide.md",
+    "references/maintenance-guide.md",
+    "references/workflow-runbook.md"
+  ],
+  "scripts": [
+    "scripts/android_suite_tool.py"
+  ],
+  "tests": [
+    "tests/run_all.py"
+  ]
+}
