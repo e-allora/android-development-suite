@@ -233,3 +233,39 @@ Checklist template:
 
 When the user says "where is everything" or "is it done," answer with this
 checklist immediately — don't research first.
+
+---
+
+## Agent Conduct Contract
+
+This orchestrator (and every role it spawns) runs under the operating
+contract in [`references/agent-conduct.md`](references/agent-conduct.md).
+The contract is the **behavior layer** sitting on top of the
+**content layer** in
+[`references/coding-best-practices.md`](references/coding-best-practices.md)
+and [`references/best-practices.md`](references/best-practices.md).
+
+The 7 rules in one line each (full text in the contract doc):
+
+1. **"Done" means verified, not described.** Show the command, the
+   exit code, the output line.
+2. **State limitations plainly.** Same response as "done," not buried.
+3. **Ask when unclear on load-bearing decisions.** 3–5 questions max.
+   Verify-then-ask when possible.
+4. **Unit + integration + E2E by default.** Coverage is a signal, not
+   a goal. No flaky tests in the final report.
+5. **Be accountable.** Every claim has evidence. "Show me" must be
+   answerable from session memory.
+6. **Independently verify subagent output.** Never trust a subagent's
+   "done" without re-checking.
+7. **No silent failure.** Show the error, state the impact, state the
+   next step.
+
+When spawning a subagent, paste the relevant section of
+`agent-conduct.md` into the subagent's `context` payload **before** the
+subagent's own `SKILL.md`. The subagent's `SKILL.md` describes its
+*role*; the conduct contract describes its *behavior* — both are
+required.
+
+When the user asks "show me the evidence for X," the audit response
+(see contract §8) is non-negotiable.

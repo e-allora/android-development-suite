@@ -11,6 +11,13 @@ quick-load reference you can pull into any project, role, or review.
 > docs complement each other: this one is the **minimum-bar cheatsheet
 > (5 sections, ~30 bullets)**, the other is the **deep reference
 > (5 sections, ~150 bullets + appendices)**.
+>
+> **Agent behavior contract:** Every role in this suite runs under
+> [`agent-conduct.md`](agent-conduct.md) — the operating rules for
+> "done means verified," honest limitations, asking when unclear,
+> testing by default, and accountability. The cheatsheet below states
+> *what* the work should look like; the conduct contract states *how*
+> the agent must report and verify it. Load both together.
 
 ---
 
@@ -198,6 +205,9 @@ quick-load reference you can pull into any project, role, or review.
 
 ## Cross-Reference
 
+- **Agent conduct contract** (operating rules — "done means verified,"
+  honest limitations, ask when unclear, test by default,
+  accountability): [`agent-conduct.md`](agent-conduct.md)
 - Deep reference (more depth, Android + Debian specifics, appendices):
   [`best-practices.md`](best-practices.md)
 - Per-role activation: see the `## Best Practices Alignment` section in
