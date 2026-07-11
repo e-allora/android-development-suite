@@ -44,14 +44,16 @@ Activate this skill when the request includes any of:
 
 1. **Read Architecture Plan** — Load the plan, ADRs, and presentation contracts
    from the Architect.
-2. **Scaffold Feature** — Run the CLI to generate the feature skeleton:
+2. **Scaffold Feature** — Run the CLI to generate the feature skeleton (if available):
    ```bash
-   python3 scripts/android_suite_tool.py scaffold \
-     --package com.example.app \
-     --feature profile \
-     --base-dir ./app/src/main/java \
+   python3 scripts/android_suite_tool.py scaffold \\
+     --package com.example.app \\
+     --feature profile \\
+     --base-dir ./app/src/main/java \\
      --use-room --use-retrofit
    ```
+   If scaffold CLI is unavailable, create module structure manually with `settings.gradle.kts`
+   and `build.gradle.kts` per module following the `:core:*` and `:feature:*` conventions.
 3. **Implement Domain Layer** — Fill in models and repository interfaces.
 4. **Implement Data Layer** — Add Room entities/DAOs, Retrofit APIs/DTOs, and
    the repository implementation.
@@ -61,6 +63,75 @@ Activate this skill when the request includes any of:
    `NavHost`.
 7. **Write Tests** — Write unit tests for the ViewModel and repository, and
    Compose UI tests for the screen. (See `android-qa-skill` for the test plan.)
+
+## Integrity Checkpoint — NEVER SKIP
+## Integrity Checkpoint — NEVER SKIP (Mandatory, not optional)
+
+Before marking Stage 4 complete, run this verification and FIX failures:
+
+```bash
+# MUST HAVE: At least one test file per ViewModel and per Repository interface
+for vm in $(find . -name "*ViewModel.kt" -not -path "*/test/*"); do
+  test_file="${vm/src/main/test/$(basename "$vm" .kt)}Test.kt"
+  test_file="${test_file//main/test}"
+  if [ ! -f "$test_file" ]; then
+    echo "❌ Missing test for: $(basename $vm)"
+  else
+    echo "✓ Test exists: $(basename $test_file)"
+  fi
+done
+
+# MUST HAVE: Core modules with tests
+test -n "$(ls core/*/src/test/java/*/*Test*.kt 2>/dev/null)" || echo "❌ No core tests found"
+
+# MUST HAVE: DI modules exist and are complete
+required_di="DatabaseModule NetworkModule EncryptionModule AiModule"
+for module in $required_di; do
+  find . -name "${module}.kt" -path "*/di/*" | grep -q . || echo "❌ Missing DI module: $module"
+done
+
+# MUST HAVE: Build passes
+./gradlew clean buildDebug --quiet 2>&1 | grep -E "FAIL|error" && echo "❌ Build failed"
+
+# MUST HAVE: Lint clean
+./gradlew lintDebug --quiet 2>&1 | grep -E "FAIL|error" && echo "❌ Lint failed"
+```
+
+**FAILURE TO CREATE TESTS = INCOMPLETE WORK. No exceptions.**  
+If any check fails, return to implementation and create the missing code.
+
+---
+
+### Verification Pitfall for Background Delegation
+
+When delegating development to a background subagent, verify completeness after task returns:
+- DAO methods implemented (insert, update, delete, query variants)
+- Repository implementation exists (not just interfaces)
+- DI module wired (Hilt `@Module` with `@Provides` for db, apis)
+- MainActivity + Navigation graph created
+- strings.xml for hardcoded text
+- Tests directory created AND test files present for each ViewModel/Repository
+- Test command `./gradlew testDebugUnitTest lint` passes
+
+Incomplete scaffolds are common — cross-check against `templates/module-structure.md` before marking Stage 4 complete.
+
+---
+
+### Import Resolution Pitfall
+
+When writing composables that use domain models, always add explicit imports for:
+- `com.eallora.breakupchatbot.domain.model.AIPersona` (enum with `getTitle()` extension)
+- `com.eallora.breakupchatbot.domain.model.Message` (data class)
+- `com.eallora.breakupchatbot.domain.model.MessageRole` (enum)
+
+Do NOT rely on fully-qualified names inside composables - they become unreadable and
+can cause IDE confusion with similar names (e.g., `User` in domain vs data layers).
+
+### Naming Conventions
+
+- **Domain models live in `:core:domain`** with no Android dependencies.
+- **Entity types should have distinct names** when crossing layers to avoid confusion.
+  Prefer `UserData` or `UserAccount` in data layer if it differs from `User` in domain.
 
 ---
 
@@ -183,7 +254,9 @@ val canSubmit by remember {
 
 ---
 
-## How to Use the Scaffold CLI
+## How to Verify Background Delegation Results
+
+After a subagent completes, run the integrity checkpoint and consult `references/delegation-checklist.md` for the verification script and common missing pieces.
 
 ```bash
 # Generate a feature with Room + Retrofit
@@ -222,6 +295,8 @@ After scaffolding, fill in the `TODO` markers and wire the navigation graph.
 | Release | `android-release-skill` | Once features + tests pass, the release engineer ships. |
 | Compose standards | `references/compose-style-guide.md` | Follow these conventions in every composable. |
 | Architecture deep dive | `references/architecture-guide.md` | Layer conventions and DI patterns. |
+| Responsive layouts | `references/responsive-layout-template.kt` | Tablet vs phone layout patterns. |
+| Module structure | `templates/module-structure.md` | Multi-module project setup guide. |
 
 
 ---

@@ -185,11 +185,7 @@ Network writes update the database; UI observes the database via Flow.
 ## Cross-References
 
 | Next Step | Skill | Why |
-|-----------|-------|-----|
-| Read the PRD | `android-product-skill` | The PRD is the input to this skill. |
-| Implement features | `android-development-skill` | The developer consumes the architecture plan. |
-| Plan testing | `android-qa-skill` | QA needs the layer boundaries to design tests. |
-| Reference docs | `references/architecture-guide.md` | Deep dive on layer conventions and DI. |
+|-----------|-------|-----|\n| Read the PRD | `android-product-skill` | The PRD is the input to this skill. |\n| Implement features | `android-development-skill` | The developer consumes the architecture plan. |\n| Plan testing | `android-qa-skill` | QA needs the layer boundaries to design tests. |\n| Reference docs | `references/architecture-guide.md` | Deep dive on layer conventions and DI. |\n| Module structure template | `templates/module-structure.md` | Pre-built module structure guidance. |
 
 When the architecture plan is complete, hand off to the **Android Developer**.
 
