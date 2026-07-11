@@ -233,3 +233,79 @@ Checklist template:
 
 When the user says "where is everything" or "is it done," answer with this
 checklist immediately — don't research first.
+
+---
+
+## Best Practices Alignment
+
+This orchestrator aligns with all 5 sections of the user's stated best-practices
+cheatsheet — captured in
+[Appendix C of the Best Practices Reference](references/best-practices.md#appendix-c-user-stated-best-practices-minimum-bar-cheatsheet).
+As gatekeeper across the full pipeline, every section is in scope: architecture,
+development, product/UX, collaboration, and operations.
+
+### §1 Architecture & Engineering (always-on gate)
+- **Modularity, layered architecture, clear contracts** — the suite enforces
+  this via per-stage role skills with explicit input/output contracts
+  (`PRD → architecture → UX → code → review → QA → build → release`).
+- **Scalability, observability from day one** — verify every stage artifact
+  names the relevant §1.2 (resilience) and §5.1 (observability) hooks it
+  introduces; the Stage 7 build and Stage 8 release are the primary
+  enforcement points.
+- **Security (least privilege, secrets vault, SCA)** — no stage may commit
+  a `local.properties` key, hardcoded token, or `signingConfigs` block with
+  committed keystore. Verify with `gitleaks` and `gradle signingReport` in
+  CI before declaring "done."
+
+### §2 Software Development
+- **CI/CD on every change, deterministic builds** — Stage 7 (Build) must
+  produce a GitHub Actions workflow that runs build + lint + test + security
+  on every PR; pinning JDK, AGP, Gradle, and lockfile hashes.
+- **Small increments, working tree always green** — never advance a stage
+  with failing CI; the orchestrator holds the gate. Use stacked PRs for
+  large features.
+
+### §3 Product & UX
+- **User goals, not features** — Stage 1 (Product) must produce a PRD that
+  states problem + user + success metric before any solution. Reject PRDs
+  that lead with "we will build X."
+- **Accessibility, design system, real-user validation** — Stage 3 (UX) must
+  deliver a Material 3 token set + screen catalog + a11y checklist; Stage 6
+  (QA) must include an automated a11y scan (Accessibility Scanner or
+  `lint` accessibility rules).
+
+### §4 Collaboration & Process
+- **Clear requirements, RFCs for non-trivial changes** — every cross-stage
+  handoff carries an ADR. `docs/adr/` must list the major decisions
+  (state mgmt, DI framework, networking, persistence) with status.
+- **Tickets with AC and DoD** — every stage produces a backlog with AC. The
+  orchestrator's status report must show acceptance criteria being met
+  before advancing.
+- **Constructive review** — Stage 5 (Review) output is feedback to the
+  developer, not a verdict. Require critical/major = 0; treat minors as
+  follow-ups.
+
+### §5 Quality, Monitoring & Operations
+- **Observability (logs, metrics, traces), SLOs** — Stage 9 (Maintenance)
+  must set up Crashlytics + a metrics SDK (or self-hosted Prometheus/Grafana
+  if the app is privacy-sensitive) before the first production rollout.
+- **Blue-green / canary / feature flags, rollback tested** — Stage 8
+  (Release) must use Play Console staged rollout; Stage 7 (Build) must
+  wire feature flags via a config service or local feature-flag library.
+- **Blameless postmortems, incidents → guardrails** — Stage 9 produces a
+  runbook for any user-facing alert. Incidents become automated tests or
+  CI gates, not heroics.
+
+Every role's `SKILL.md` (this orchestrator + the 9 specialists) inlines the
+exact minimum-bar bullets relevant to its stage. The full cheatsheet is
+reproduced in
+[Appendix C](references/best-practices.md#appendix-c-user-stated-best-practices-minimum-bar-cheatsheet);
+the deep reference is the rest of `references/best-practices.md`.
+
+**How to apply during pipeline runs:**
+1. Before spawning Stage N, restate the user-stated bullets that apply (in
+   the subagent `context` payload, after the role's full `SKILL.md`).
+2. In the stage's status report, name which bullets the deliverable
+   satisfies.
+3. If a deliverable skips a required bullet without justification, block
+   the gate.

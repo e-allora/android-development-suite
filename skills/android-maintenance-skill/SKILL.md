@@ -140,6 +140,21 @@ After planning, loop back to **Product** for the next iteration.
 
 ## Best Practices Alignment
 
+### User-Stated Best Practices (Minimum Bar)
+
+This role also aligns with the user's canonical 5-section best-practices
+list. The minimum-bar bullets for this role are: §5.1, §5.3, §1.2, §2.2, §4.1.
+
+Each bullet is reproduced with a cross-reference to the deep guidance in
+[Appendix C of the Best Practices Reference](references/best-practices.md#appendix-c-user-stated-best-practices-minimum-bar-cheatsheet).
+When auditing this stage's output, every bullet above must show evidence in
+the deliverable. The orchestrator's status report must name which bullets
+are satisfied before advancing past the gate.
+
+The full Appendix C is the source of truth for the minimum-bar language;
+the deep reference (the rest of `references/best-practices.md`) backs
+each bullet with examples and platform-specific guidance.
+
 This role aligns with the following sections of the shared
 [Best Practices Reference](references/best-practices.md).
 
