@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://e-allora.github.io/android-development-suite/harness/project.schema.json",
+  "title": "Harness Project State",
+  "description": "Single source of truth for where a project is in the 9-stage Android Development Suite pipeline. Read by harness.py to decide what to do next; written by harness.py and the user after each stage completes.",
+  "type": "object",
+  "required": ["name", "created_at", "root", "pipeline", "current_stage"],
+  "properties": {
+    "name": { "type": "string", "description": "Project slug, e.g. 'voxbook' or 'readee'." },
+    "brief": { "type": "string", "description": "One-paragraph user brief that started the project." },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "root": { "type": "string", "description": "Absolute path to the project root on the dev machine." },
+    "tech_stack": {
+      "type": "object",
+      "description": "Locked at Stage 0 from PROJECT_CONTEXT.md.",
+      "properties": {
+        "language":   { "type": "string" },
+        "min_sdk":    { "type": "integer" },
+        "compile_sdk":{ "type": "integer" },
+        "ui":         { "type": "string" },
+        "di":         { "type": "string" },
+        "db":         { "type": "string" },
+        "network":    { "type": "string" },
+        "build_tool": { "type": "string" }
+      }
+    },
+    "pipeline": {
+      "type": "object",
+      "description": "Per-stage status. Each stage is read by the harness to decide the next action.",
+      "properties": {
+        "0_init":         { "$ref": "#/definitions/stage" },
+        "1_product":      { "$ref": "#/definitions/stage" },
+        "2_architecture": { "$ref": "#/definitions/stage" },
+        "3_ux":           { "$ref": "#/definitions/stage" },
+        "4_development":  { "$ref": "#/definitions/stage" },
+        "5_review":       { "$ref": "#/definitions/stage" },
+        "6_qa":           { "$ref": "#/definitions/stage" },
+        "7_build":        { "$ref": "#/definitions/stage" },
+        "8_release":      { "$ref": "#/definitions/stage" },
+        "9_maintenance":  { "$ref": "#/definitions/stage" }
+      }
+    },
+    "current_stage": {
+      "type": "string",
+      "enum": [
+        "0_init", "1_product", "2_architecture", "3_ux", "4_development",
+        "5_review", "6_qa", "7_build", "8_release", "9_maintenance", "done"
+      ],
+      "description": "Pointer to the stage the harness should run next."
+    },
+    "gate_blockers": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Reasons the current stage cannot advance. Empty when ready."
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Map of artifact path -> last-updated timestamp."
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "status", "created_at"],
+        "properties": {
+          "id":         { "type": "string", "description": "ADR-001, ADR-002, ..." },
+          "title":      { "type": "string" },
+          "status":     { "type": "string", "enum": ["proposed", "accepted", "deprecated", "superseded"] },
+          "created_at": { "type": "string" },
+          "path":       { "type": "string", "description": "Path to the ADR file." }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "stage": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "awaiting_review", "blocked", "done", "skipped"],
+          "description": "pending = not started; in_progress = role is working; awaiting_review = output exists, gate check pending; blocked = cannot proceed; done = verified and accepted; skipped = not needed for this project."
+        },
+        "owner":       { "type": "string", "description": "Role or subagent handling the stage." },
+        "started_at":  { "type": "string", "format": "date-time" },
+        "completed_at":{ "type": "string", "format": "date-time" },
+        "attempts":    { "type": "integer", "description": "How many times the stage has been entered. > 1 means the loop fired (e.g. Review -> Dev fix)." },
+        "output": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Absolute paths to artifacts produced by this stage. Each path must exist for status=done."
+        },
+        "verification": {
+          "type": "object",
+          "description": "Evidence the stage is genuinely done (commands run, exit codes, test results). Populated before transitioning to done.",
+          "properties": {
+            "commands": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "cmd":     { "type": "string" },
+                  "exit":   { "type": "integer" },
+                  "summary":{ "type": "string" }
+                }
+              }
+            },
+            "limitations": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    }
+  }
+}

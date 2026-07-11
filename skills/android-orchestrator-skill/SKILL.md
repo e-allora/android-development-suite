@@ -269,3 +269,31 @@ required.
 
 When the user asks "show me the evidence for X," the audit response
 (see contract §8) is non-negotiable.
+
+## Workflow Harness (state machine + driver)
+
+The 9-stage pipeline is now backed by a runnable harness at
+[`harness/`](harness/). It is the **process layer** — bookkeeping,
+gates, state — that the role skills (the **role layer**) and the
+conduct contract (the **behavior layer**) sit on top of.
+
+When you start a new project, the workflow is:
+
+1. `python3 harness/harness.py init <name> "<brief>"`
+2. `harness next` — see the current stage, the role to load, and the
+   gate to clear.
+3. Load the role's `SKILL.md` (`skill_view name='<role>'`).
+4. Read the stage runbook at `harness/stage_runbooks/<stage>.md`.
+5. Produce the artifacts. Run the verification. Mark done. Advance.
+6. The harness enforces gates; it won't let you skip ahead.
+
+To pick up an existing in-progress project:
+
+1. `harness init <name> "<brief>" --force` (overwrites the empty
+   state).
+2. `harness import` — scans for known artifacts and back-fills the
+   state. This is informational; you still need to verify the imported
+   stages before trusting them.
+
+The harness has its own tests: `python3 harness/test_harness.py`
+(36 tests). Full reference at `references/harness.md`.
