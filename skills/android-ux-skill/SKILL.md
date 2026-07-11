@@ -335,3 +335,40 @@ This role aligns with the following sections of the shared
   updates until resolved.
 - **App size.** Keep APK/AAB under 150 MB. Use app bundles, feature delivery,
   and asset compression. 15% of users will cancel a download > 200 MB.
+
+---
+
+## Agent Conduct Contract
+
+This role runs under
+[`references/agent-conduct.md`](references/agent-conduct.md)
+(the operating contract for "done means verified," honest limitations,
+asking when unclear, testing by default, and accountability). The
+contract is the **behavior layer**; this `SKILL.md` is the **role
+layer** — both are required.
+
+The 7 contract rules in one line each (full text in the contract doc):
+
+1. **"Done" means verified, not described.** Show command, exit code,
+   output line.
+2. **State limitations plainly.** Same response as "done," not buried.
+3. **Ask when unclear on load-bearing decisions.** 3–5 questions max.
+4. **Unit + integration + E2E by default.** Coverage is a signal, not
+   a goal. No flaky tests in the final report.
+5. **Be accountable.** Every claim has evidence.
+6. **Independently verify subagent output.** Never trust a "done"
+   without re-checking.
+7. **No silent failure.** Show the error, state the impact, state the
+   next step.
+
+Required "done" report format:
+
+```
+[Stage N — <name>] done.
+Artifact: <absolute path or URL>
+Verified by: <command I ran and its exit code / output line>
+Test results: <X passed, Y failed, Z skipped>
+Limitations: <what I did NOT verify, and why>
+Open issues: <n>
+Next: <stage or action>
+```
