@@ -59,11 +59,17 @@ Or target a specific stage by keyword:
 ## Best Practices
 
 Every role skill embeds the relevant sections from
-[references/best-practices.md](references/best-practices.md) — a 586-line
+[references/best-practices.md](references/best-practices.md) — a 728-line
 reference covering architecture, development, product/UX, collaboration,
 quality/operations, and platform-specific guidance (Android + Debian).
 When a role subagent loads, it gets its best-practice sections inline —
 no separate file load needed.
+
+The reference also contains **[Appendix C](references/best-practices.md#appendix-c-user-stated-best-practices-minimum-bar-cheatsheet)**,
+the user's canonical 5-section best-practices list captured verbatim with
+deep-reference cross-links and a per-role activation cheatsheet. The
+orchestrator + every role skill links to Appendix C, so the minimum-bar
+language stays in the active context when the pipeline runs.
 
 ## Proven
 
