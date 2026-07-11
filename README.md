@@ -56,6 +56,15 @@ Or target a specific stage by keyword:
 - AGP 8.7+, Gradle 8.12+
 - minSdk 26, compileSdk 35
 
+## Best Practices
+
+Every role skill embeds the relevant sections from
+[references/best-practices.md](references/best-practices.md) — a 586-line
+reference covering architecture, development, product/UX, collaboration,
+quality/operations, and platform-specific guidance (Android + Debian).
+When a role subagent loads, it gets its best-practice sections inline —
+no separate file load needed.
+
 ## Proven
 
 This framework drove the [VoxBook](https://github.com/e-allora/voxbook) pilot app
@@ -66,11 +75,11 @@ AAB, full documentation set.
 
 ```
 ├── SKILL.md                    # Orchestrator entry point
-├── marketplace.json            # Suite metadata (Her mes marketplace)
+├── marketplace.json            # Suite metadata (Hermes marketplace)
 ├── install.sh                  # Symlink installer
 ├── skills/                     # 10 role skills (orchestrator + 9 roles)
 ├── templates/                  # PROJECT_CONTEXT.md + Compose blueprints
-├── references/                 # Engineering guides (one per role)
+├── references/                 # Engineering guides + best-practices.md
 ├── scripts/                    # android_suite_tool.py (scaffold + audit CLI)
 └── tests/                      # Suite self-tests
 ```
