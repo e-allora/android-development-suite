@@ -202,3 +202,34 @@ The orchestrator's own run pattern (parallel fan-out, subagent payload shape,
 worked VoxBook example) is captured in `references/run-pattern.md`.
 
 When invoked, start at **Stage 0 (Initialize)** and drive forward.
+
+## Ecosystem Integrity Check (run BEFORE claiming work is "done")
+
+The user judges completeness by **real verifiable output**, not descriptions.
+Before calling any project "done," verify all four pillars are in place:
+
+1. **GitHub repo exists** — the framework AND the app must be on GitHub with
+   documented commits. The android-development-suite itself lived local-only
+   for weeks before being pushed — don't repeat that gap.
+2. **Local clone is current** — if a framework/app was built elsewhere and only
+   exists on GitHub, clone it. A repo is not a working app.
+3. **App actually runs** — produce real tool output (green build, CLI output,
+   test results). Never claim "done" based on pipeline artifact descriptions
+   alone. The VoxBook pilot had all 9 stage docs but the app was never verified
+   running on the target machine — that's a GAP.
+4. **Wiki is documented** — every artifact (framework, pilot app) gets a page
+   in the Obsidian wiki under `entities/` with GitHub URL, local path, tech
+   stack, and current status. Update the index and log.
+
+Checklist template:
+```
+| Pillar | Artifact | GitHub | Local | Verified | Wiki |
+|--------|----------|--------|-------|----------|------|
+| Framework | android-development-suite | ✓ url | ✓ path | N/A | ✓ entities/ |
+| Framework | debian-development-suite | ✓ url | ✓ path | N/A | ✓ entities/ |
+| Pilot | voxbook | ✓ url | ✓ path | ./gradlew ... | ✓ entities/ |
+| Pilot | vox-debian | ✓ url | ✓ path | vox --help | ✓ entities/ |
+```
+
+When the user says "where is everything" or "is it done," answer with this
+checklist immediately — don't research first.

@@ -338,3 +338,123 @@ as a pre-flight gate before building the release AAB.
 | Acceptance criteria | `android-product-skill` | Verify all ACs are met. |
 | Release checklist | `references/release-checklist.md` | The full 11-section checklist. |
 | Architecture | `references/architecture-guide.md` | Confirm DI graph and modules are stable. |
+
+
+---
+
+## Best Practices Alignment
+
+This role aligns with the following sections of the shared
+[Best Practices Reference](references/best-practices.md).
+
+### 5.2 Deployment & Rollout
+
+- **No big-bang releases.** Every deployment strategy should support fast,
+  tested rollback:
+  - **Blue-green:** two identical environments. Deploy to inactive, switch
+    traffic. Rollback: switch back. Cost: double infrastructure.
+  - **Canary:** deploy to a small % of users/traffic. Monitor for N minutes.
+    If clean, ramp to 100%. If not, roll back the canary — most users never
+    saw the bad version.
+  - **Feature flags:** deploy code dark. Enable for internal users, then beta,
+    then 5% → 50% → 100%. Rollback = disable flag (seconds, no redeploy).
+    Clean up flags after full rollout — stale flags are tech debt.
+- **Rollback is tested and fast.** Rehearse rollbacks in staging. The rollback
+  procedure is documented, automated, and takes under 5 minutes. The person
+  on-call at 3 AM can execute it without thinking.
+- **Database migrations are backward-compatible.** Phase 1: add columns/tables
+  (code ignores them). Phase 2: deploy code that writes to both old and new
+  schema. Phase 3: migrate existing data. Phase 4: deploy code that reads only
+  new schema. Phase 5: drop old columns. Never deploy a migration that breaks
+  the currently-running version.
+- **Release notes.** Every release gets human-readable notes: new features,
+  bug fixes, breaking changes, known issues, upgrade instructions. Not a git
+  log dump. Write for the user, not for yourself.
+- **Stakeholder communication.** Product, support, marketing, and sales know
+  what's shipping, when, and what changes for users. A surprise release is a
+  support nightmare. Communication happens before the deploy, not after.
+
+### 6.1 Android
+
+- **Battery & data.** Minimize background work. Use WorkManager for deferrable
+  tasks, not AlarmManager or bare Services. Batch network requests. Compress
+  uploads. Respect Data Saver and battery optimization settings.
+- **Process death.** Android kills your process any time. Save state in
+  `onSaveInstanceState` and `ViewModel` + `SavedStateHandle`. Restore
+  seamlessly — the user should not know you were killed.
+- **Permissions.** Request at runtime, explain why, handle denial gracefully.
+  Never request a permission you don't need. Respect "don't ask again."
+- **Play Store compliance.** Target API level within 1 year of latest. Declare
+  data safety accurately. Honor the family policy, background location policy,
+  and foreground service restrictions. A rejected update can block all future
+  updates until resolved.
+- **App size.** Keep APK/AAB under 150 MB. Use app bundles, feature delivery,
+  and asset compression. 15% of users will cancel a download > 200 MB.
+
+### 2.3 Version Control & Branching
+
+- **Pick a branching strategy and enforce it.**
+  - **Trunk-based development** — short-lived feature branches (< 1 day), merge
+    to main frequently, feature-flag incomplete work. Best for CI/CD velocity.
+  - **GitHub Flow** — feature branches off main, PR + review + CI → merge.
+    Good for open-source and team coordination.
+  - **GitFlow** — separate `develop`, `release`, and `hotfix` branches. Use only
+    when you have scheduled releases and multiple versions in production.
+  - **Don't mix them.** Pick one per repo and stick with it.
+- **Branches are short-lived.** A branch open longer than 2 days is a risk.
+  Rebase on main daily to avoid merge hell. If work is too big for a short
+  branch, break it into smaller features behind a flag.
+- **Commit messages matter.** Structure: `<type>: <subject>` (50 chars max for
+  subject). Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`,
+  `perf`, `security`. Body explains why, not what. Link to issue/ticket.
+  ```
+  fix: prevent duplicate user registration on concurrent signup
+
+  The email-uniqueness check and INSERT were not in a transaction,
+  allowing a race condition. Wrapped both in a serializable transaction.
+  Added an integration test reproducing the race.
+
+  Fixes #1427
+  ```
+- **Protect main.** Require PR reviews, CI passing, and status checks before
+  merge. No direct pushes. Signed commits encouraged but not required for all
+  teams.
+- **Atomic commits.** Each commit is one logical change. It compiles. It passes
+  tests. It can be reverted cleanly. Never commit WIP ("fix stuff", "wip",
+  "tmp") — squash before merging.
+- **Semantic versioning.** `MAJOR.MINOR.PATCH`. Bump MAJOR for breaking changes,
+  MINOR for backward-compatible features, PATCH for backward-compatible fixes.
+  Tag every release. Automate version bumping in CI.
+- **Changelog.** Maintain a human-readable CHANGELOG.md. Every user-facing
+  change gets an entry. Link to the PR/issue. Keep it current — update in the
+  same PR that makes the change.
+
+### 5.1 Observability
+
+- **Three pillars.** Logs (discrete events), metrics (aggregate numbers over
+  time), traces (end-to-end request flows). All three or you're flying blind.
+- **Structured logging.** JSON or key=value format. Every log line has:
+  timestamp, level, service name, trace ID, and message. No free-text logs —
+  you can't query "something went wrong."
+- **Metrics that matter.** RED method for services: Rate (requests/sec), Errors
+  (failure rate), Duration (latency p50/p95/p99). USE method for resources:
+  Utilization, Saturation, Errors. Business metrics: signups, purchases,
+  feature adoption. Don't collect metrics you won't alert on.
+- **Distributed tracing.** Every incoming request gets a trace ID. Propagate
+  it across service calls. Tools: OpenTelemetry, Jaeger, Zipkin. Without
+  traces, debugging a slow request across 5 services is guesswork.
+- **SLIs and SLOs.** Service Level Indicators measure what users care about
+  (latency, error rate, availability). Service Level Objectives are the targets
+  (99.9% availability, p95 latency < 200ms). SLOs are NOT internal targets —
+  they're user-facing promises. Set them, measure them, alert on burn rate.
+- **Dashboards with purpose.** One dashboard per service showing the "golden
+  signals" (latency, traffic, errors, saturation). One business dashboard for
+  stakeholders. No dashboard with 50 charts that nobody looks at. Alerts fire
+  from SLO burn rate, not from dashboard thresholds.
+- **Alert fatigue prevention.** Every alert must require human action. If the
+  alert fires and the correct response is "acknowledge and ignore," delete the
+  alert. Alert on symptoms (SLO burn rate, error rate spike), not causes (CPU
+  > 80%). Page for user-facing impact; ticket for everything else.
+- **Log aggregation.** Centralize logs from all services. Tools: Loki,
+  Elasticsearch, CloudWatch. Retention: 30 days hot, 90 days cold. Logs that
+  aren't searchable don't exist.
